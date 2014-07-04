@@ -1,0 +1,11 @@
+{
+	"name":"Molecular Dynamics",
+	"description":"Chrome Molecular Dynamics App",
+	"version":"0.1",
+	"manifest_version": 2,
+	"app": {
+		"background": {
+			"scripts":["background.js"]
+		}
+	}
+}
