@@ -107,6 +107,10 @@ function simulate() {
   for (var i=0;i<25;i++) {
     doStep();
   }
+  chrome.runtime.getBackgroundPage(function(w) {
+    w.x=x;
+    w.y=y;
+  });
   drawSystem();
 
   // while running call function again

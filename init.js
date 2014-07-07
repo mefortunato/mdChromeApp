@@ -7,7 +7,7 @@ var myCanvas;
 var myContext;
 
 // md stuff
-var numMol=25;
+var numMol=60;
 var cutoff=2;
 var epsilon=1;
 var sigma=1;
@@ -19,6 +19,7 @@ var nrg;
 
 // initialization function - called when window opens and initializeButton onclick
 function init() {
+
 // find pixel dimensions of window
 winWidth=window.innerWidth;
 winHeight=window.innerHeight;
@@ -121,5 +122,11 @@ onload = function() {
 
   var coolButton=document.getElementById('coolButton');
   coolButton.onclick=function() {changeT(0.5);};
+
+  chrome.runtime.getBackgroundPage(function(w) {
+    w.numMol=numMol;
+    w.x=x;
+    w.y=y;
+  });
 
 }
