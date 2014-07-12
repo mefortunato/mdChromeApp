@@ -14,6 +14,30 @@ function changeT(factor) {
   }
 }
 
+function u_lj_pair(mol1,mol2) {
+  dr=sepDist(x[mol1],y[mol1],x[mol2],y[mol2]);
+  if (dr<cutoff) {
+    rSquared=dr*dr;
+    rSquaredInv = sigma*sigma / rSquared;
+    attract=rSquaredInv*rSquaredInv*rSquaredInv;
+    repel=attract*attract;
+    return 4*epsilon*(repel-attract);
+  }
+  else {
+    return 0;
+  }
+}
+
+function u_lj_sys() {
+  var energy=0;
+  for (var i=0;i<numMol;i++) {
+    for (var j=i+1;j<numMol;j++) {
+      energy+=u_lj_pair(i,j);
+    }
+  }
+  return energy;
+}
+
 // function to calculate and set forces assuming mass=1
 function setForces() {
 
@@ -46,10 +70,10 @@ function setForces() {
         fy=fOverR*dy;
 
         // b/c mass=1 accelerations are forces; force on i is calculated, force on j is negative force on i
-        ax[i]+=fx;
-        ax[j]-=fx;
-        ay[i]+=fy;
-        ay[j]-=fy;
+        ax[i]+=fx/mass;
+        ax[j]-=fx/mass;
+        ay[i]+=fy/mass;
+        ay[j]-=fy/mass;
       }
     }
   }
@@ -57,6 +81,10 @@ function setForces() {
 
 // function to run one md step
 function doStep() {
+
+  // calculate new forces
+  setForces();
+
   // store helpful variations of dt
   var halfdt=0.5*dt;
   var halfdt2=halfdt*dt;
@@ -74,30 +102,27 @@ function doStep() {
   for (var i=0;i<numMol;i++) {
     vx[i]+=ax[i]*halfdt;
     vy[i]+=ay[i]*halfdt;
-    if (x[i]<=1) {
+    if (x[i]<=sigma/2) {
       vx[i]=vx[i]*-1;
       ax[i]=ax[i]*-1;
-      x[i]=1;
+      x[i]=sigma/2;
     }
-    if (x[i]>=19) {
+    if (x[i]>=systemSize-sigma/2) {
       vx[i]=vx[i]*-1;
       ax[i]=ax[i]*-1;
-      x[i]=19;
+      x[i]=systemSize-sigma/2;
     }
-    if (y[i]<=1) {
+    if (y[i]<=sigma/2) {
       vy[i]=vy[i]*-1;
       ay[i]=ay[i]*-1;
-      y[i]=1;
+      y[i]=sigma/2;
     }
-    if (y[i]>=19) {
+    if (y[i]>=systemSize-sigma/2) {
       vy[i]=vy[i]*-1;
       ay[i]=ay[i]*-1;
-      y[i]=19;
+      y[i]=systemSize-sigma/2;
     }
   }
-
-  // calculate new forces
-  setForces();
 }
 
 // function to repeatedly do a couple steps
